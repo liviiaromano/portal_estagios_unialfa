@@ -20,8 +20,9 @@ export class Empresa {
   @Column({ unique: true })
   email!: string;
 
-  @Column()
-  senha!: string; // 🔥 ADICIONADO
+  // Não retorna a senha nas consultas por padrão
+  @Column({ select: false })
+  senha!: string;
 
   @Column()
   telefone!: string;

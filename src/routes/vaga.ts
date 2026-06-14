@@ -1,32 +1,65 @@
 import { Router } from "express";
 import { AppDataSource } from "../database/data-source";
 
-import { Vaga } from "../models/Vaga";
+import autenticacao from "../middlewares/autenticacao";
 
+import { Vaga } from "../models/Vaga";
 import { VagaRepository } from "../repositories/VagaRepository";
 import { VagaService } from "../services/VagaService";
 import { VagaController } from "../controllers/VagaController";
 
 const router = Router();
 
+/*
+|--------------------------------------------------------------------------
+| Repository
+|--------------------------------------------------------------------------
+*/
 const repo = new VagaRepository(
   AppDataSource.getRepository(Vaga)
 );
 
-const service =
-  new VagaService(repo);
+/*
+|--------------------------------------------------------------------------
+| Service
+|--------------------------------------------------------------------------
+*/
+const service = new VagaService(repo);
 
-const controller =
-  new VagaController(service);
+/*
+|--------------------------------------------------------------------------
+| Controller
+|--------------------------------------------------------------------------
+*/
+const controller = new VagaController(service);
 
-router.post("/", controller.criar);
+/*
+|--------------------------------------------------------------------------
+| Routes
+|--------------------------------------------------------------------------
+*/
 
+// Públicas
 router.get("/", controller.listar);
-
 router.get("/:id", controller.buscar);
 
-router.put("/:id", controller.atualizar);
+// Empresa autenticada
+router.post(
+  "/",
+  autenticacao,
+  controller.criar
+);
 
-router.delete("/:id", controller.deletar);
+router.put(
+  "/:id",
+  autenticacao,
+  controller.atualizar
+);
+
+router.delete(
+  "/:id",
+  autenticacao,
+  controller.deletar
+);
 
 export default router;

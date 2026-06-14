@@ -8,44 +8,39 @@ export class DashboardEmpresaService {
   ) {}
 
   async getDashboard(empresaId: number) {
-    const vagas = (await this.vagaRepo.listar()) ?? [];
-    const candidaturas = (await this.candidaturaRepo.listar()) ?? [];
+    const vagas = await this.vagaRepo.listar();
 
-    const vagasDaEmpresa = vagas.filter(
-      (vaga) => vaga.empresa && vaga.empresa.id === empresaId
+    const vagasEmpresa = vagas.filter(
+      (vaga) => vaga.empresa.id === empresaId
     );
 
-    const vagasIds = vagasDaEmpresa.map((v) => v.id);
+    let totalCandidaturas = 0;
 
-    const candidaturasDaEmpresa = candidaturas.filter(
-      (c) => c.vaga && vagasIds.includes(c.vaga.id)
+    const vagasComCandidaturas = await Promise.all(
+      vagasEmpresa.map(async (vaga) => {
+        const candidaturas =
+          await this.candidaturaRepo.buscarPorVaga(
+            vaga.id
+          );
+
+        totalCandidaturas += candidaturas.length;
+
+        return {
+          vaga,
+          totalCandidaturas:
+            candidaturas.length,
+          candidaturas,
+        };
+      })
     );
-
-    const totalVagas = vagasDaEmpresa.length;
-    const totalCandidaturas = candidaturasDaEmpresa.length;
-
-    const pendentes = candidaturasDaEmpresa.filter(
-      (c) => c.status === "PENDENTE"
-    ).length;
-
-    const aprovadas = candidaturasDaEmpresa.filter(
-      (c) => c.status === "APROVADO"
-    ).length;
-
-    const reprovadas = candidaturasDaEmpresa.filter(
-      (c) => c.status === "REPROVADO"
-    ).length;
 
     return {
       resumo: {
-        totalVagas,
+        totalVagas:
+          vagasEmpresa.length,
         totalCandidaturas,
-        pendentes,
-        aprovadas,
-        reprovadas,
       },
-      vagas: vagasDaEmpresa,
-      candidaturas: candidaturasDaEmpresa,
+      vagas: vagasComCandidaturas,
     };
   }
 }

@@ -1,42 +1,74 @@
+import { hash } from "bcrypt";
 import { EmpresaRepository } from "../repositories/EmpresaRepository";
 import AppError from "../utils/AppError";
+
+const SALT = 8;
 
 export class EmpresaService {
   constructor(private repo: EmpresaRepository) {}
 
   async criar(data: any) {
-    return this.repo.criar(data);
+    const existe =
+      await this.repo.buscarPorCnpj(
+        data.cnpj
+      );
+
+    if (existe) {
+      throw new AppError(
+        "Empresa já cadastrada",
+        400
+      );
+    }
+
+    const senhaHash = await hash(
+      data.senha,
+      SALT
+    );
+
+    return this.repo.criar({
+      ...data,
+      senha: senhaHash,
+    });
   }
 
-  async listar() {
+  listar() {
     return this.repo.listar();
   }
 
-  async buscarPorId(id: number) {
+  buscarPorId(id: number) {
     return this.repo.buscarPorId(id);
   }
 
-  async atualizar(id: number, data: any) {
-    return this.repo.atualizar(id, data);
+  async atualizar(
+    id: number,
+    data: any
+  ) {
+    if (data.senha) {
+      data.senha = await hash(
+        data.senha,
+        SALT
+      );
+    }
+
+    return this.repo.atualizar(
+      id,
+      data
+    );
   }
 
-  async deletar(id: number) {
+  remover(id: number) {
     return this.repo.deletar(id);
   }
 
-  // =========================
-  // EXTRAS DO CONTROLLER
-  // =========================
-
-  async aprovar(id: number) {
-    return this.repo.atualizar(id, { status: "APROVADO" });
+  aprovar(id: number) {
+    return this.repo.atualizar(id, {
+      status: "APROVADA",
+    });
   }
 
-  async bloquear(id: number) {
-    return this.repo.atualizar(id, { status: "BLOQUEADO" });
-  }
-
-  async remover(id: number) {
-    return this.repo.deletar(id);
+  bloquear(id: number) {
+    return this.repo.atualizar(id, {
+      status: "BLOQUEADA",
+    });
   }
 }

@@ -34,6 +34,29 @@ export class NotificacaoController {
     }
   };
 
+  buscar = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const id = Number(
+        req.params.id
+      );
+
+      const notificacao =
+        await this.service.buscarPorId(
+          id
+        );
+
+      return res.json(
+        notificacao
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   marcarComoLida = async (
     req: Request,
     res: Response,
@@ -52,6 +75,27 @@ export class NotificacaoController {
       return res.json(
         notificacao
       );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deletar = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const id = Number(
+        req.params.id
+      );
+
+      await this.service.deletar(id);
+
+      return res.json({
+        message:
+          "Notificação removida com sucesso",
+      });
     } catch (error) {
       next(error);
     }

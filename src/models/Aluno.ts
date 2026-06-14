@@ -17,7 +17,8 @@ export class Aluno {
   @Column({ unique: true })
   email!: string;
 
-  @Column()
+  // Não retorna a senha nas consultas
+  @Column({ select: false })
   senha!: string;
 
   @Column({ nullable: true })

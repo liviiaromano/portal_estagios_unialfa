@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { AppDataSource } from "../database/data-source";
 
+import autenticacao from "../middlewares/autenticacao";
+
 import { Candidatura } from "../models/Candidatura";
 import { Notificacao } from "../models/Notificacao";
 
@@ -17,30 +19,43 @@ const router = Router();
 | Repositories
 |--------------------------------------------------------------------------
 */
-const candidaturaRepository = new CandidaturaRepository(
-  AppDataSource.getRepository(Candidatura)
-);
+const candidaturaRepository =
+  new CandidaturaRepository(
+    AppDataSource.getRepository(Candidatura)
+  );
 
-const notificacaoRepository = new NotificacaoRepository(
-  AppDataSource.getRepository(Notificacao)
-);
+const notificacaoRepository =
+  new NotificacaoRepository(
+    AppDataSource.getRepository(Notificacao)
+  );
 
 /*
 |--------------------------------------------------------------------------
 | Services
 |--------------------------------------------------------------------------
 */
-const candidaturaService = new CandidaturaService(
-  candidaturaRepository,
-  notificacaoRepository
-);
+const candidaturaService =
+  new CandidaturaService(
+    candidaturaRepository,
+    notificacaoRepository
+  );
 
 /*
 |--------------------------------------------------------------------------
 | Controller
 |--------------------------------------------------------------------------
 */
-const controller = new CandidaturaController(candidaturaService);
+const controller =
+  new CandidaturaController(
+    candidaturaService
+  );
+
+/*
+|--------------------------------------------------------------------------
+| Todas as rotas exigem autenticação
+|--------------------------------------------------------------------------
+*/
+router.use(autenticacao);
 
 /*
 |--------------------------------------------------------------------------
@@ -48,22 +63,40 @@ const controller = new CandidaturaController(candidaturaService);
 |--------------------------------------------------------------------------
 */
 
-// CRIAR
-router.post("/", controller.criar);
+// Criar candidatura
+router.post(
+  "/",
+  controller.criar
+);
 
-// LISTAR (admin/debug)
-router.get("/", controller.listar);
+// Listar todas
+router.get(
+  "/",
+  controller.listar
+);
 
-// DASHBOARD DO ALUNO (tem que vir antes do /:id)
-router.get("/aluno/:alunoId", controller.dashboardAluno);
+// Dashboard do aluno logado
+router.get(
+  "/dashboard/aluno",
+  controller.dashboardAluno
+);
 
-// BUSCAR POR VAGA (empresa)
-router.get("/vaga/:vagaId", controller.buscarPorVaga);
+// Buscar candidatos de uma vaga
+router.get(
+  "/vaga/:vagaId",
+  controller.buscarPorVaga
+);
 
-// BUSCAR POR ID (sempre por último por causa do Express)
-router.get("/:id", controller.buscar);
+// Buscar candidatura por ID
+router.get(
+  "/:id",
+  controller.buscar
+);
 
-// ATUALIZAR STATUS
-router.patch("/:id/status", controller.atualizarStatus);
+// Alterar status
+router.patch(
+  "/:id/status",
+  controller.atualizarStatus
+);
 
 export default router;

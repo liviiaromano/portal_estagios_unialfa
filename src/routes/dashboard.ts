@@ -2,35 +2,71 @@ import { Router } from "express";
 import { AppDataSource } from "../database/data-source";
 
 import autenticacao from "../middlewares/autenticacao";
+
 import { Candidatura } from "../models/Candidatura";
+import { Vaga } from "../models/Vaga";
+
 import { CandidaturaRepository } from "../repositories/CandidaturaRepository";
+import { VagaRepository } from "../repositories/VagaRepository";
+
 import { DashboardAlunoService } from "../services/DashboardAlunoService";
+import { DashboardEmpresaService } from "../services/DashboardEmpresaService";
+
 import { DashboardAlunoController } from "../controllers/DashboardAlunoController";
+import { DashboardEmpresaController } from "../controllers/DashboardEmpresaController";
 
 const router = Router();
 
 /*
 |--------------------------------------------------------------------------
-| Repository
+| Repositories
 |--------------------------------------------------------------------------
 */
-const candidaturaRepo = new CandidaturaRepository(
-  AppDataSource.getRepository(Candidatura)
-);
+
+const candidaturaRepo =
+  new CandidaturaRepository(
+    AppDataSource.getRepository(
+      Candidatura
+    )
+  );
+
+const vagaRepo =
+  new VagaRepository(
+    AppDataSource.getRepository(Vaga)
+  );
 
 /*
 |--------------------------------------------------------------------------
-| Service
+| Services
 |--------------------------------------------------------------------------
 */
-const dashboardService = new DashboardAlunoService(candidaturaRepo);
+
+const dashboardAlunoService =
+  new DashboardAlunoService(
+    candidaturaRepo
+  );
+
+const dashboardEmpresaService =
+  new DashboardEmpresaService(
+    vagaRepo,
+    candidaturaRepo
+  );
 
 /*
 |--------------------------------------------------------------------------
-| Controller
+| Controllers
 |--------------------------------------------------------------------------
 */
-const controller = new DashboardAlunoController(dashboardService);
+
+const dashboardAlunoController =
+  new DashboardAlunoController(
+    dashboardAlunoService
+  );
+
+const dashboardEmpresaController =
+  new DashboardEmpresaController(
+    dashboardEmpresaService
+  );
 
 /*
 |--------------------------------------------------------------------------
@@ -38,11 +74,16 @@ const controller = new DashboardAlunoController(dashboardService);
 |--------------------------------------------------------------------------
 */
 
-// dashboard do aluno (protegido)
 router.get(
   "/aluno",
   autenticacao,
-  controller.getDashboard
+  dashboardAlunoController.getDashboard
+);
+
+router.get(
+  "/empresa",
+  autenticacao,
+  dashboardEmpresaController.getDashboard
 );
 
 export default router;

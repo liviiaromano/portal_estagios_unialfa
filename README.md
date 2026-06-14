@@ -27,6 +27,6 @@ Estrutura do Repositório
 👥 Equipe
 Gabriel [Responsável pelo Design UX/UI]
 Eduardo - Java (Back Office Institucional)
-Livia - Git / DevOps
-Isabelly - PHP (Web)
+Livia - EMPRESA PHP (Web) - Git / DevOps
+Isabelly - Aluno PHP (Web)
 Guilherme - Banco de Dados / Node.js (API)

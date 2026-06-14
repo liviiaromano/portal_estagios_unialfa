@@ -37,6 +37,12 @@ const handleErrorMiddleware = (
   res: Response,
   _next: NextFunction
 ) => {
+
+  console.error("=================================");
+  console.error("ERRO CAPTURADO:");
+  console.error(error);
+  console.error("=================================");
+
   if (error instanceof ZodError) {
     return res.status(400).json({
       message: "Erro de validação",

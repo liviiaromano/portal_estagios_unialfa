@@ -1,0 +1,5 @@
+RELATÓRIO DE CANDIDATURAS
+
+Aluno: João Silva
+Vaga: Desenvolvedor Java
+Status: APROVADA

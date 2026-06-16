@@ -1,0 +1,4 @@
+RELATÓRIO DE EMPRESAS
+
+1 - Empresa Teste - APROVADA
+2 - Empresa Alpha - PENDENTE
